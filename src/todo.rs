@@ -22,7 +22,6 @@ impl Todo {
         for line in content.lines().skip(1) {
             if let Some(entry) = Entry::from_file_line(line) {
                 entries.push(entry);
-                println!("Made an entry");
             }
         }
 
@@ -36,19 +35,34 @@ impl Todo {
             self.list_entries();
             return;
         }
-        match &command_line_args[1][..] {
+        let print_lines = match &command_line_args[1][..] {
             "add" => self.add(&command_line_args[2..]),
-            _ => self.list_entries(),
+            "list" => self.list_entries(),
+            _ => Self::help(),
         };
+        println!("{}", print_lines);
     }
 
     // The command for adding an entry looks like:
     // mytodo add mango
-    fn add(&self, args: &[String]) {
-        panic!("This is add");
+    fn add(&self, args: &[String]) -> String {
+        
+        self.list_entries()
     }
 
-    fn list_entries(&self) {
-        panic!("This is list_entries");
+    fn list_entries(&self) -> String {
+        let mut final_print = String::new();
+
+        for (idx, an_entry) in self.entries.iter().enumerate() {
+            final_print += &an_entry.to_string(idx + 1);
+        }
+        
+        final_print
     }
+
+    fn help() -> String {
+        let mytodo_help = "this is help".to_string();
+        mytodo_help
+    }
+
 }
