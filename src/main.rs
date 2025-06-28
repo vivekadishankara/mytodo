@@ -4,8 +4,9 @@ use std::env::args;
 use crate::todo::Todo;
 
 fn main() {
-    let args: Vec<String> = args().collect();
+    let this_args: Vec<String> = args().collect();
 
-    let todo = Todo::new();
-    todo.enact(&args);
+    let mut todo = Todo::new();
+    let print_lines = todo.enact(&this_args);
+    println!("{}", print_lines);
 }

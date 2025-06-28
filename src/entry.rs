@@ -19,21 +19,26 @@ impl Entry {
         if parts.len() < 3 {
             return None;
         }
-        let completed = parts[2].trim().parse::<u8>().unwrap();
+        let completed = parts[2].trim().parse::<u8>().ok()?;
         let completed = completed != (0 as u8);
 
 
         Some(Self{
-            title: parts[1].to_string(),
+            title: parts[1].trim().to_string(),
             completed,
         })
     }
 
-    pub fn to_string(&self, num: usize) -> String {
+    pub fn to_screen_string(&self, num: usize) -> String {
         if self.completed {
-            format!("{} {}", num, self.title.strikethrough())
+            format!("{}  {}", num, self.title.strikethrough())
         } else {
-            format!("{} {}", num, self.title)
+            format!("{}  {}", num, self.title)
         }
+    }
+
+    pub fn to_file_string(&self, num: usize) -> String {
+        let completed = if self.completed { 1 } else { 0 };
+        format!("{},{},{}", num, self.title, completed)
     }
 }

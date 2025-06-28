@@ -30,34 +30,55 @@ impl Todo {
         }
     }
 
-    pub fn enact(&self, command_line_args: &Vec<String>) {
+    pub fn enact(&mut self, command_line_args: &[String]) -> String {
         if command_line_args.len() < 2 {
-            self.list_entries();
-            return;
+            return self.list_entries();
         }
         let print_lines = match &command_line_args[1][..] {
             "add" => self.add(&command_line_args[2..]),
             "list" => self.list_entries(),
             _ => Self::help(),
         };
-        println!("{}", print_lines);
+        print_lines
+    }
+
+    fn write_to_file(&self) {
+        let mut final_print = String::from("id,title,completed\n");
+        for (idx, an_entry) in self.entries.iter().enumerate() {
+            final_print += &an_entry.to_file_string(idx + 1);
+            final_print += "\n";
+        }
+        if let Err(e) = fs::write("todo.csv", final_print) {
+            eprintln!("Falied to write the file todo.csv due to error {}", e);
+        }
+    }
+
+    fn list_entries(&self) -> String {
+        let mut final_print = String::from("id entry\n");
+
+        for (idx, an_entry) in self.entries.iter().enumerate() {
+            final_print += &an_entry.to_screen_string(idx + 1);
+            if idx < self.entries.len() - 1 {
+                final_print += "\n";
+            }
+        }
+        
+        final_print
+    }
+
+    fn publish(&self) -> String {
+        self.write_to_file();
+        self.list_entries()
     }
 
     // The command for adding an entry looks like:
     // mytodo add mango
-    fn add(&self, args: &[String]) -> String {
-        
-        self.list_entries()
-    }
-
-    fn list_entries(&self) -> String {
-        let mut final_print = String::new();
-
-        for (idx, an_entry) in self.entries.iter().enumerate() {
-            final_print += &an_entry.to_string(idx + 1);
+    fn add(&mut self, args: &[String]) -> String {
+        for an_arg in args {
+            let new_entry = Entry::new(an_arg.clone(), false);
+            self.entries.push(new_entry);
         }
-        
-        final_print
+        self.publish()
     }
 
     fn help() -> String {
