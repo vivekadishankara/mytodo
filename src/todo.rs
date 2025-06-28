@@ -38,6 +38,7 @@ impl Todo {
             "list" => self.list_entries(),
             "add" => self.add(&command_line_args[2..]),
             "reset" => self.reset(),
+            "done" => self.done(&command_line_args[2..]),
             _ => Self::help(),
         };
         print_lines
@@ -79,8 +80,23 @@ impl Todo {
         }
         self.publish()
     }
+
     fn reset(&mut self) -> String {
         self.entries = Vec::new();
+        self.publish()
+    }
+
+    fn done(&mut self, args: &[String]) -> String {
+        for an_arg in args {
+            let num: usize = an_arg.parse::<usize>()
+                .expect(&format!("Given entry [{}] is not a valid number", an_arg));
+            if num < 1 || num > self.entries.len() {
+                panic!("{}", format!("Given number [{}] is not valid as it is out of range", num));
+            }
+
+            self.entries[num - 1].completed = !self.entries[num - 1].completed;
+        }
+
         self.publish()
     }
 

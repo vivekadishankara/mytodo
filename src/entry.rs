@@ -31,9 +31,9 @@ impl Entry {
 
     pub fn to_screen_string(&self, num: usize) -> String {
         if self.completed {
-            format!("{}  {}", num, self.title.strikethrough())
+            format!("{:>2}  {}", num, self.title.strikethrough())
         } else {
-            format!("{}  {}", num, self.title)
+            format!("{:>2}  {}", num, self.title)
         }
     }
 
