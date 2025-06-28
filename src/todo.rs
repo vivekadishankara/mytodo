@@ -35,8 +35,8 @@ impl Todo {
             return self.list_entries();
         }
         let print_lines = match &command_line_args[1][..] {
-            "add" => self.add(&command_line_args[2..]),
             "list" => self.list_entries(),
+            "add" => self.add(&command_line_args[2..]),
             _ => Self::help(),
         };
         print_lines
