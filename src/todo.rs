@@ -37,6 +37,7 @@ impl Todo {
         let print_lines = match &command_line_args[1][..] {
             "list" => self.list_entries(),
             "add" => self.add(&command_line_args[2..]),
+            "reset" => self.reset(),
             _ => Self::help(),
         };
         print_lines
@@ -54,13 +55,14 @@ impl Todo {
     }
 
     fn list_entries(&self) -> String {
-        let mut final_print = String::from("id entry\n");
+        let mut final_print = String::from("id entry");
 
         for (idx, an_entry) in self.entries.iter().enumerate() {
+            final_print += "\n";
             final_print += &an_entry.to_screen_string(idx + 1);
-            if idx < self.entries.len() - 1 {
-                final_print += "\n";
-            }
+        //     if idx < self.entries.len() - 1 {
+        //         
+        //     }
         }
         
         final_print
@@ -78,6 +80,10 @@ impl Todo {
             let new_entry = Entry::new(an_arg.clone(), false);
             self.entries.push(new_entry);
         }
+        self.publish()
+    }
+    fn reset(&mut self) -> String {
+        self.entries = Vec::new();
         self.publish()
     }
 
