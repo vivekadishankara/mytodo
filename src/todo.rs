@@ -60,9 +60,6 @@ impl Todo {
         for (idx, an_entry) in self.entries.iter().enumerate() {
             final_print += "\n";
             final_print += &an_entry.to_screen_string(idx + 1);
-        //     if idx < self.entries.len() - 1 {
-        //         
-        //     }
         }
         
         final_print
