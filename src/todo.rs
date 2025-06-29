@@ -1,5 +1,6 @@
 use std::fs;
 use std::io::ErrorKind;
+use std::collections::HashSet;
 use crate::entry::Entry;
 
 pub struct Todo {
@@ -39,6 +40,7 @@ impl Todo {
             "add" => self.add(&command_line_args[2..]),
             "reset" => self.reset(),
             "done" => self.done(&command_line_args[2..]),
+            "remove" => self.remove(&command_line_args[2..]),
             _ => Self::help(),
         };
         print_lines
@@ -86,16 +88,47 @@ impl Todo {
         self.publish()
     }
 
-    fn done(&mut self, args: &[String]) -> String {
-        for an_arg in args {
-            let num: usize = an_arg.parse::<usize>()
-                .expect(&format!("Given entry [{}] is not a valid number", an_arg));
-            if num < 1 || num > self.entries.len() {
-                panic!("{}", format!("Given number [{}] is not valid as it is out of range", num));
-            }
+    fn arg_to_num(&self, an_arg: &String) -> usize {
+        let num: usize = an_arg.parse::<usize>()
+            .expect(&format!("Given entry [{}] is not a valid number", an_arg));
+        if num < 1 || num > self.entries.len() {
+            panic!("{}", format!("Given number [{}] is not valid as it is out of range", num));
+        }
+        num
+    }
 
+    fn done(&mut self, args: &[String]) -> String {
+        if args.is_empty() {
+            panic!("done takes at least one argument");
+        }
+
+        for an_arg in args {
+            let num = self.arg_to_num(&an_arg);
             self.entries[num - 1].completed = !self.entries[num - 1].completed;
         }
+
+        self.publish()
+    }
+
+    fn remove(&mut self, args: &[String]) -> String {
+        if args.is_empty() {
+            panic!("done takes at least one argument");
+        }
+
+        let mut indices_to_remove = HashSet::new();
+        for an_arg in args {
+            let num = self.arg_to_num(&an_arg);
+            indices_to_remove.insert(num - 1);
+        }
+
+        let mut new_entries: Vec<Entry> = Vec::new();
+        for (idx, an_entry) in self.entries.iter().enumerate() {
+            if indices_to_remove.contains(&idx) {
+                continue;
+            }
+            new_entries.push(an_entry.clone());
+        }
+        self.entries = new_entries;
 
         self.publish()
     }

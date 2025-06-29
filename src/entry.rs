@@ -1,5 +1,6 @@
 use colored::*;
 
+#[derive(Clone)]
 pub struct Entry {
     pub title: String,
     pub completed: bool
